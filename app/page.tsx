@@ -26,7 +26,7 @@ export default function HomePage() {
 
           <p className="max-w-2xl text-pretty text-lg leading-8 text-foreground/70">
             Aplikasi ini mengambil data produk dari API publik DummyJSON dan menampilkan
-            perbedaan teknik rendering: SSG (static + cache), SSR (per-request), dan CSR (fetch di browser).
+            perbedaan teknik rendering: SSG (static), SSR (konsep server render), dan CSR (fetch di browser).
           </p>
 
           <div className="grid gap-6 md:grid-cols-3">
@@ -39,7 +39,7 @@ export default function HomePage() {
               </div>
               <div className="mt-4 text-lg font-semibold tracking-tight">Static Site Generation</div>
               <div className="mt-2 text-sm leading-6 text-foreground/70">
-                Fetch di server, halaman statis, revalidate 1 jam.
+                Fetch saat build, hasilnya halaman statis.
               </div>
             </Link>
 
@@ -52,7 +52,7 @@ export default function HomePage() {
               </div>
               <div className="mt-4 text-lg font-semibold tracking-tight">Server-Side Rendering</div>
               <div className="mt-2 text-sm leading-6 text-foreground/70">
-                Fetch tiap request (no-store) dan render di server.
+                Di GitHub Pages (static export), halaman ini jadi statis saat build.
               </div>
             </Link>
 

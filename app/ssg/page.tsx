@@ -3,14 +3,12 @@ import { getProducts } from "@/app/lib/dummyjson";
 import { ProductCard } from "@/app/components/ProductCard";
 import type { Metadata } from "next";
 
-export const revalidate = 3600; // SSG + ISR (revalidate per 1 hour)
-
 export const metadata: Metadata = {
   title: "Next.js Rendering Demo — SSG",
 };
 
 export default async function SsgPage() {
-  const data = await getProducts({ limit: 12, skip: 0, next: { revalidate } });
+  const data = await getProducts({ limit: 12, skip: 0, cache: "force-cache" });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-brand-purple-soft via-background to-brand-orange-soft">
@@ -20,7 +18,7 @@ export default async function SsgPage() {
             <div className="text-sm font-semibold text-foreground/80">SSG</div>
             <h1 className="text-2xl font-semibold tracking-tight">Static Site Generation</h1>
             <p className="mt-1 text-sm text-foreground/70">
-              Data di-fetch di server dan di-cache. Halaman statis, revalidate tiap 1 jam.
+              Data di-fetch saat build dan jadi halaman statis.
             </p>
           </div>
           <Link

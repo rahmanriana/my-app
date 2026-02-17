@@ -3,14 +3,12 @@ import { getProducts } from "@/app/lib/dummyjson";
 import { ProductCard } from "@/app/components/ProductCard";
 import type { Metadata } from "next";
 
-export const dynamic = "force-dynamic"; // SSR
-
 export const metadata: Metadata = {
   title: "Next.js Rendering Demo — SSR",
 };
 
 export default async function SsrPage() {
-  const data = await getProducts({ limit: 12, skip: 0, cache: "no-store" });
+  const data = await getProducts({ limit: 12, skip: 0, cache: "force-cache" });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-brand-purple-soft via-background to-brand-orange-soft">
@@ -20,7 +18,7 @@ export default async function SsrPage() {
             <div className="text-sm font-semibold text-foreground/80">SSR</div>
             <h1 className="text-2xl font-semibold tracking-tight">Server-Side Rendering</h1>
             <p className="mt-1 text-sm text-foreground/70">
-              Data di-fetch setiap request (no-store) dan dirender di server.
+              Untuk GitHub Pages (static export), halaman ini di-render statis saat build.
             </p>
           </div>
           <Link
