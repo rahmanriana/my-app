@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js Rendering Demo (SSG / SSR / CSR)
 
-## Getting Started
+Aplikasi web sederhana untuk tugas kuliah: mendemokan 3 teknik rendering modern di Next.js (App Router), integrasi API publik, dan state management.
 
-First, run the development server:
+## Tech Stack
+
+- Next.js (App Router)
+- React
+- TypeScript
+
+## Sumber Data (API Publik)
+
+Menggunakan DummyJSON Products API:
+
+- https://dummyjson.com/products
+
+Data ditampilkan dinamis dalam UI (grid produk, pencarian, favorites).
+
+## Teknik Rendering (Wajib)
+
+Tiga teknik rendering yang diimplementasikan:
+
+1) **SSG**: [app/ssg/page.tsx](app/ssg/page.tsx)
+	- Menggunakan server component + caching.
+	- `export const revalidate = 3600` (ISR) agar halaman statis namun bisa diperbarui periodik.
+
+2) **SSR**: [app/ssr/page.tsx](app/ssr/page.tsx)
+	- `export const dynamic = "force-dynamic"` + `fetch(..., { cache: "no-store" })`
+	- Data diambil per request.
+
+3) **CSR**: [app/csr/page.tsx](app/csr/page.tsx)
+	- Client component dengan `useEffect()` untuk fetch data di browser.
+	- Ada loading indicator dan error handling.
+
+## State Management (Wajib)
+
+1) **Local state (useState)**
+	- Input pencarian di halaman CSR.
+
+2) **Context API (nilai tambah)**
+	- Favorites global: [app/state/favorites.tsx](app/state/favorites.tsx)
+	- Provider dipasang di root: [app/providers.tsx](app/providers.tsx) dan [app/layout.tsx](app/layout.tsx)
+	- Tersimpan di `localStorage` (persist antar refresh).
+
+## Halaman
+
+- `/` : menu utama demo
+- `/ssg` : demo SSG
+- `/ssr` : demo SSR
+- `/csr` : demo CSR + favorites + search
+
+## Cara Menjalankan
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Catatan
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Jika API DummyJSON sedang tidak bisa diakses, halaman CSR akan menampilkan error state.
