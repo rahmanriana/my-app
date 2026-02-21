@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useCartOptional } from "@/app/state/cart";
 import type { DummyJsonProduct } from "@/app/lib/dummyjson";
+import { withBasePath } from "@/app/lib/basePath";
 
 export function ProductCard({ product }: { product: DummyJsonProduct }) {
   const cart = useCartOptional();
@@ -49,7 +50,7 @@ export function ProductCard({ product }: { product: DummyJsonProduct }) {
           alt={product.title}
           className="mt-4 h-40 w-full rounded-2xl object-cover"
           loading="lazy"
-          onError={() => setImgSrc("/store-hero.svg")}
+          onError={() => setImgSrc(withBasePath("/store-hero.svg"))}
         />
       ) : (
         <div className="mt-4 flex h-40 items-center justify-center rounded-2xl bg-background text-xs text-foreground/60">

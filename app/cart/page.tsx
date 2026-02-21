@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCart } from "@/app/state/cart";
+import { withBasePath } from "@/app/lib/basePath";
 
 export default function CartPage() {
   const cart = useCart();
@@ -49,12 +50,12 @@ export default function CartPage() {
                     <div className="h-16 w-16 overflow-hidden rounded-2xl bg-background">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={item.thumbnail ?? "/store-hero.svg"}
+                        src={item.thumbnail ?? withBasePath("/store-hero.svg")}
                         alt={item.title}
                         className="h-full w-full object-cover"
                         loading="lazy"
                         onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src = "/store-hero.svg";
+                          (e.currentTarget as HTMLImageElement).src = withBasePath("/store-hero.svg");
                         }}
                       />
                     </div>

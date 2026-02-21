@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useCartOptional } from "@/app/state/cart";
+import { getBasePath, withBasePath } from "@/app/lib/basePath";
 
 type NavItem = {
   label: string;
@@ -14,8 +15,10 @@ export function Navbar() {
   const cart = useCartOptional();
   const pathname = usePathname() ?? "/";
 
-  const normalizedPathname = pathname.startsWith("/my-app")
-    ? pathname.slice("/my-app".length) || "/"
+  const basePath = getBasePath();
+
+  const normalizedPathname = basePath && pathname.startsWith(basePath)
+    ? pathname.slice(basePath.length) || "/"
     : pathname;
 
   const navItems: NavItem[] = useMemo(
@@ -50,7 +53,7 @@ export function Navbar() {
           <span className="inline-flex h-9 items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/rahman-store-logo.svg"
+              src={withBasePath("/rahman-store-logo.svg")}
               alt="Rahman Store"
               className="h-9 w-auto"
               loading="eager"

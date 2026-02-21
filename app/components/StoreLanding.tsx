@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { withBasePath } from "@/app/lib/basePath";
 
 export function StoreLanding(props: {
   modeLabel: "SSG" | "SSR" | "CSR";
@@ -72,7 +73,7 @@ export function StoreLanding(props: {
             <div className="overflow-hidden rounded-[1.5rem] border border-black/10 bg-background/60 dark:border-white/10 dark:bg-black/20">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/rahman-store-logo.svg"
+                src={withBasePath("/rahman-store-logo.svg")}
                 alt="Rahman Store"
                 className="h-[260px] w-full object-contain p-10 sm:h-[300px]"
                 loading="lazy"
