@@ -23,12 +23,29 @@ export function CsrClient(props: { backHref?: string } = {}) {
       setError(null);
 
       try {
-        const url = new URL("/api/products", window.location.origin);
-        url.searchParams.set("limit", "24");
-        url.searchParams.set("skip", "0");
+        const limit = "24";
+        const skip = "0";
 
-        const res = await fetch(url.toString(), { signal: controller.signal });
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+        const apiUrl = new URL("/api/products", window.location.origin);
+        apiUrl.searchParams.set("limit", limit);
+        apiUrl.searchParams.set("skip", skip);
+
+        const upstreamUrl = new URL("https://dummyjson.com/products");
+        upstreamUrl.searchParams.set("limit", limit);
+        upstreamUrl.searchParams.set("skip", skip);
+
+        let res: Response;
+        try {
+          res = await fetch(apiUrl.toString(), { signal: controller.signal });
+          if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+        } catch (apiError) {
+          if (controller.signal.aborted) return;
+          res = await fetch(upstreamUrl.toString(), { signal: controller.signal });
+          if (!res.ok) {
+            const reason = apiError instanceof Error ? apiError.message : "Unknown error";
+            throw new Error(`Request failed: ${res.status} (API: ${reason})`);
+          }
+        }
 
         const json = (await res.json()) as DummyJsonProductsResponse;
         setProducts(json.products);
