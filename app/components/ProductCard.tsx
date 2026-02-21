@@ -1,18 +1,23 @@
 "use client";
 
-import { useMemo } from "react";
-import { useFavorites } from "@/app/state/favorites";
+import { useMemo, useState } from "react";
+import { useCartOptional } from "@/app/state/cart";
 import type { DummyJsonProduct } from "@/app/lib/dummyjson";
 
 export function ProductCard({ product }: { product: DummyJsonProduct }) {
-  const favorites = useFavorites();
+  const cart = useCartOptional();
 
-  const favItem = useMemo(
-    () => ({ id: product.id, title: product.title, thumbnail: product.thumbnail }),
-    [product.id, product.thumbnail, product.title],
+  const [imgSrc, setImgSrc] = useState<string | undefined>(product.thumbnail);
+
+  const cartItem = useMemo(
+    () => ({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      thumbnail: product.thumbnail,
+    }),
+    [product.id, product.price, product.thumbnail, product.title],
   );
-
-  const isFav = favorites.isFavorite(product.id);
 
   return (
     <div className="rounded-[1.5rem] border border-black/10 bg-white/70 p-5 backdrop-blur dark:border-white/10 dark:bg-black/30">
@@ -26,27 +31,25 @@ export function ProductCard({ product }: { product: DummyJsonProduct }) {
             ) : null}
           </div>
         </div>
-        <button
-          type="button"
-          className={
-            isFav
-              ? "inline-flex h-9 items-center justify-center rounded-xl bg-brand-purple px-3 text-xs font-semibold text-white"
-              : "inline-flex h-9 items-center justify-center rounded-xl border border-black/10 bg-white/70 px-3 text-xs font-semibold text-foreground/90 dark:border-white/10 dark:bg-black/30"
-          }
-          onClick={() => favorites.toggle(favItem)}
-          aria-pressed={isFav}
-        >
-          {isFav ? "Favorited" : "Favorite"}
-        </button>
+        {cart ? (
+          <button
+            type="button"
+            className="inline-flex h-9 items-center justify-center rounded-xl bg-brand-orange px-3 text-xs font-semibold text-white"
+            onClick={() => cart.add(cartItem, 1)}
+          >
+            Tambah
+          </button>
+        ) : null}
       </div>
 
-      {product.thumbnail ? (
+      {imgSrc ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={product.thumbnail}
+          src={imgSrc}
           alt={product.title}
           className="mt-4 h-40 w-full rounded-2xl object-cover"
           loading="lazy"
+          onError={() => setImgSrc("/store-hero.svg")}
         />
       ) : (
         <div className="mt-4 flex h-40 items-center justify-center rounded-2xl bg-background text-xs text-foreground/60">

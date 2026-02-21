@@ -1,18 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type {
   DummyJsonProduct,
   DummyJsonProductsResponse,
 } from "@/app/lib/dummyjson";
-import { ProductCard } from "@/app/components/ProductCard";
-import { useFavorites } from "@/app/state/favorites";
+import { ProductsListClient } from "@/app/components/ProductsListClient";
+import { useCart } from "@/app/state/cart";
 
-export function CsrClient() {
-  const favorites = useFavorites();
-
-  const [query, setQuery] = useState("");
+export function CsrClient(props: { backHref?: string } = {}) {
+  const cart = useCart();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [products, setProducts] = useState<DummyJsonProduct[]>([]);
@@ -25,10 +23,9 @@ export function CsrClient() {
       setError(null);
 
       try {
-        const url = new URL("https://dummyjson.com/products");
+        const url = new URL("/api/products", window.location.origin);
         url.searchParams.set("limit", "24");
         url.searchParams.set("skip", "0");
-        url.searchParams.set("select", "id,title,price,thumbnail,rating");
 
         const res = await fetch(url.toString(), { signal: controller.signal });
         if (!res.ok) throw new Error(`Request failed: ${res.status}`);
@@ -51,38 +48,36 @@ export function CsrClient() {
     };
   }, []);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return products;
-    return products.filter((p) => p.title.toLowerCase().includes(q));
-  }, [products, query]);
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-brand-purple-soft via-background to-brand-orange-soft">
+    <div className="min-h-screen bg-gradient-to-b from-brand-blue-soft via-background to-brand-green-soft">
       <header className="border-b border-black/5 bg-background/80 backdrop-blur dark:border-white/10">
         <div className="mx-auto w-full max-w-6xl px-6 py-5">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <div className="text-sm font-semibold text-foreground/80">CSR</div>
               <h1 className="text-2xl font-semibold tracking-tight">Client-Side Rendering</h1>
-              <p className="mt-1 text-sm text-foreground/70">
-                Data di-fetch di browser (useEffect). Ada loading, error handling, dan filter (useState).
-              </p>
+              <p className="mt-1 text-sm text-foreground/70">Data diambil di browser.</p>
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="rounded-xl border border-black/10 bg-white/70 px-4 py-2 text-sm font-semibold text-foreground/80 dark:border-white/10 dark:bg-black/30">
-                Favorites: {favorites.count}
+                Cart: {cart.count}
               </div>
               <button
                 type="button"
                 className="inline-flex h-10 items-center justify-center rounded-xl border border-black/10 bg-white/70 px-4 text-sm font-semibold dark:border-white/10 dark:bg-black/30"
-                onClick={favorites.clear}
+                onClick={cart.clear}
               >
-                Clear favorites
+                Clear cart
               </button>
               <Link
-                href="/"
+                href="/cart"
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-black/10 bg-white/70 px-4 text-sm font-semibold dark:border-white/10 dark:bg-black/30"
+              >
+                Cart
+              </Link>
+              <Link
+                href={props.backHref ?? "/"}
                 className="inline-flex h-10 items-center justify-center rounded-xl border border-black/10 bg-white/70 px-4 text-sm font-semibold dark:border-white/10 dark:bg-black/30"
               >
                 Back
@@ -93,22 +88,6 @@ export function CsrClient() {
       </header>
 
       <main className="mx-auto w-full max-w-6xl px-6 py-10">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <label className="grid gap-2 text-sm">
-            <span className="font-medium">Cari produk (local state)</span>
-            <input
-              className="h-12 w-full max-w-md rounded-xl border border-black/10 bg-background px-4 outline-none ring-brand-purple/20 focus:ring-4 dark:border-white/10"
-              placeholder="mis. iphone"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </label>
-
-          <div className="text-sm text-foreground/70">
-            Menampilkan <span className="font-semibold">{filtered.length}</span> item
-          </div>
-        </div>
-
         {loading ? (
           <div className="mt-8 rounded-2xl border border-black/10 bg-white/70 p-6 text-sm font-medium dark:border-white/10 dark:bg-black/30">
             Loading products...
@@ -118,39 +97,42 @@ export function CsrClient() {
             <div className="font-semibold text-brand-orange">Gagal memuat data</div>
             <div className="mt-1 text-foreground/70">{error}</div>
             <div className="mt-3 text-xs text-foreground/60">
-              Coba refresh. Pastikan internet aktif dan DummyJSON bisa diakses.
+              Coba refresh. Pastikan dev server berjalan dan endpoint /api/products bisa diakses.
             </div>
           </div>
         ) : (
-          <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+          <ProductsListClient initialProducts={products} />
         )}
 
-        {favorites.items.length ? (
+        {cart.items.length ? (
           <section className="mt-10">
-            <h2 className="text-lg font-semibold tracking-tight">Favorites (Context API)</h2>
+            <h2 className="text-lg font-semibold tracking-tight">Keranjang (Context API)</h2>
             <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {favorites.items.map((f) => (
+              {cart.items.map((item) => (
                 <div
-                  key={f.id}
+                  key={item.id}
                   className="rounded-[1.5rem] border border-black/10 bg-white/70 p-5 backdrop-blur dark:border-white/10 dark:bg-black/30"
                 >
-                  <div className="text-sm font-semibold">{f.title}</div>
+                  <div className="text-sm font-semibold">{item.title}</div>
+                  <div className="mt-2 text-xs text-foreground/70">
+                    Qty: <span className="font-semibold">{item.qty}</span> • Price: ${item.price}
+                  </div>
                   <div className="mt-3 flex items-center justify-between gap-3">
-                    <div className="text-xs text-foreground/70">id: {f.id}</div>
+                    <div className="text-xs text-foreground/70">id: {item.id}</div>
                     <button
                       type="button"
                       className="inline-flex h-9 items-center justify-center rounded-xl bg-brand-orange px-3 text-xs font-semibold text-white"
-                      onClick={() => favorites.remove(f.id)}
+                      onClick={() => cart.remove(item.id)}
                     >
-                      Remove
+                      Hapus
                     </button>
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-5 text-sm font-medium dark:border-white/10 dark:bg-black/30">
+              Subtotal: <span className="font-semibold">${cart.subtotal.toFixed(2)}</span>
             </div>
           </section>
         ) : null}

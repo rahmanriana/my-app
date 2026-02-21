@@ -1,10 +1,16 @@
 /** @type {import('next').NextConfig} */
+const isGithubPagesBuild = process.env.GITHUB_ACTIONS === "true";
+
 const nextConfig = {
-  output: "export",
-  images: { unoptimized: true }, 
-  basePath: "/my-app",        
-  assetPrefix: "/my-app/", 
-  trailingSlash: true,
+  images: { unoptimized: true },
+  ...(isGithubPagesBuild
+    ? {
+        output: "export",
+        basePath: "/my-app",
+        assetPrefix: "/my-app/",
+        trailingSlash: true,
+      }
+    : {}),
 };
 
 module.exports = nextConfig;

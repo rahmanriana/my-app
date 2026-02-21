@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { useFavorites } from "@/app/state/favorites";
+import { useCartOptional } from "@/app/state/cart";
 
 type NavItem = {
   label: string;
@@ -10,7 +11,12 @@ type NavItem = {
 };
 
 export function Navbar() {
-  const favorites = useFavorites();
+  const cart = useCartOptional();
+  const pathname = usePathname() ?? "/";
+
+  const normalizedPathname = pathname.startsWith("/my-app")
+    ? pathname.slice("/my-app".length) || "/"
+    : pathname;
 
   const navItems: NavItem[] = useMemo(
     () => [
@@ -38,30 +44,51 @@ export function Navbar() {
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
         <Link
           href="/"
-          className="group inline-flex items-center gap-2 font-semibold tracking-tight"
-          aria-label="Rendering Demo"
+          className="group inline-flex items-center gap-3 font-semibold tracking-tight"
+          aria-label="Rahman Store"
         >
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-purple text-white shadow-sm">
-            NX
+          <span className="inline-flex h-9 items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/rahman-store-logo.svg"
+              alt="Rahman Store"
+              className="h-9 w-auto"
+              loading="eager"
+            />
           </span>
-          <span className="text-lg">
-            Next.js <span className="text-brand-orange">Rendering</span>
-          </span>
+          <span className="text-lg">Rahman Store</span>
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
           {navItems.map((item) => (
+            (() => {
+              const isActive =
+                normalizedPathname === item.href ||
+                (item.href !== "/" && normalizedPathname.startsWith(`${item.href}/`));
+              const baseClass =
+                "text-foreground/80 transition-colors hover:text-foreground";
+              const activeClass = "text-foreground font-semibold underline underline-offset-8 decoration-brand-orange";
+
+              return (
             <Link
               key={item.href}
               href={item.href}
-              className="text-foreground/80 transition-colors hover:text-foreground"
+                  className={isActive ? activeClass : baseClass}
+                  aria-current={isActive ? "page" : undefined}
             >
               {item.label}
             </Link>
+              );
+            })()
           ))}
-          <div className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm font-semibold text-foreground/80 dark:border-white/10 dark:bg-black/30">
-            Favorites: {favorites.count}
-          </div>
+          {cart ? (
+            <Link
+              href="/cart"
+              className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white/70 px-4 py-2 text-sm font-semibold text-foreground/80 dark:border-white/10 dark:bg-black/30"
+            >
+              Cart: {cart.count}
+            </Link>
+          ) : null}
         </nav>
 
         <button
@@ -103,18 +130,37 @@ export function Navbar() {
         <div className="border-t border-black/5 bg-background md:hidden dark:border-white/10">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-6 py-4">
             {navItems.map((item) => (
+              (() => {
+                const isActive =
+                  normalizedPathname === item.href ||
+                  (item.href !== "/" && normalizedPathname.startsWith(`${item.href}/`));
+                const baseClass =
+                  "rounded-xl px-3 py-2 text-sm font-medium text-foreground/90 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]";
+                const activeClass =
+                  "rounded-xl px-3 py-2 text-sm font-semibold text-foreground underline underline-offset-8 decoration-brand-orange";
+
+                return (
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-xl px-3 py-2 text-sm font-medium text-foreground/90 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                    className={isActive ? activeClass : baseClass}
+                    aria-current={isActive ? "page" : undefined}
                 onClick={() => setOpen(false)}
               >
                 {item.label}
               </Link>
+                );
+              })()
             ))}
-            <div className="mt-2 rounded-xl border border-black/10 bg-white/70 px-4 py-3 text-sm font-semibold text-foreground/80 dark:border-white/10 dark:bg-black/30">
-              Favorites: {favorites.count}
-            </div>
+            {cart ? (
+              <Link
+                href="/cart"
+                className="mt-2 rounded-xl border border-black/10 bg-white/70 px-4 py-3 text-sm font-semibold text-foreground/80 dark:border-white/10 dark:bg-black/30"
+                onClick={() => setOpen(false)}
+              >
+                Cart: {cart.count}
+              </Link>
+            ) : null}
           </div>
         </div>
       ) : null}

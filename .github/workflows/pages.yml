@@ -30,6 +30,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Prepare static export routes
+        run: |
+          rm -rf app/ssr-dev || true
+          cp app/ssr/page.pages.tsx app/ssr/page.tsx
+          cp app/ssr/products/page.pages.tsx app/ssr/products/page.tsx
+
       - name: Build (Next.js static export)
         run: npm run build
 

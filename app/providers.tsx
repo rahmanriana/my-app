@@ -1,7 +1,7 @@
 "use client";
 
-import { FavoritesProvider } from "@/app/state/favorites";
+import { CartProvider } from "@/app/state/cart";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <FavoritesProvider>{children}</FavoritesProvider>;
+  return <CartProvider>{children}</CartProvider>;
 }

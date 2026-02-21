@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "Next.js Rendering Demo — SSG/SSR/CSR",
@@ -16,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className="antialiased">
-        <Providers>{children}</Providers>
+        {children}
       </body>
     </html>
   );
